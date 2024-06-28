@@ -52,19 +52,31 @@ public:
 	}
 
 	//Metods
-	virtual void print()const
+	virtual std::ostream& info(std::ostream& os)const
 	{
-		cout << last_name << " " << first_name << " " << age;
+		return os << last_name << " " << first_name << " " << age;
 	}
 	virtual void info()const
 	{
-		//this->print();
 		cout << last_name << " " << first_name << " " << age;
-		cout << endl;
 	}
-
 	//Operators
 };
+
+std::ostream& operator<<(std::ostream& os, const Human& obj)
+{
+	return obj.info(os);
+}
+
+void Print(Human* group[], const int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		cout << delimetr;
+		cout << *group[i] << endl;// ->info();
+	}
+	cout << delimetr;
+}
 
 #define STUDENT_TAKE_PARAMETRS const std::string speciality, std::string group, double rating, double attendanse
 #define STUDENT_GIVE_PARAMETRS speciality, group, rating, attendanse
@@ -124,17 +136,14 @@ public:
 	}
 
 	//Metods
-	void print() const override
-	{
-		Human::info();
-		cout << speciality << " " << group << " " << rating << " " << attendanse;
-	}
 	void info()const override
 	{
-		//this->print();
 		Human::info();
-		cout << speciality << " " << group << " " << rating << " " << attendanse;
-		cout << "\n";
+		cout << speciality << " " << group << " " << rating << " " << attendanse << "\n";
+	}
+	std::ostream& info(std::ostream& os)const override
+	{
+		return Human::info(os) << " " << speciality << " " << group << " " << rating << " " << attendanse;
 	}
 };
 
@@ -155,7 +164,7 @@ public:
 	}
 
 	//Constructors
-	Graduate(HUMAN_TAKE_PARAMETRS, STUDENT_TAKE_PARAMETRS, std::string subject): Student(HUMAN_GIVE_PARAMETRS, STUDENT_GIVE_PARAMETRS)
+	Graduate(HUMAN_TAKE_PARAMETRS, STUDENT_TAKE_PARAMETRS, std::string subject) : Student(HUMAN_GIVE_PARAMETRS, STUDENT_GIVE_PARAMETRS)
 	{
 		set_subject(subject);
 		cout << "GConstructor:\t" << this << endl;
@@ -166,17 +175,14 @@ public:
 	}
 
 	//Metods
-	void print()const override
-	{
-		Student::info();
-		cout << subject;
-	}
 	void info()const override
 	{
-		//this->print();
 		Student::info();
-		cout << subject;
-		cout << endl;
+		cout << subject << endl;
+	}
+	std::ostream& info(std::ostream& os)const override
+	{
+		 return Student::info(os) << " " << subject;
 	}
 };
 
@@ -217,25 +223,18 @@ public:
 	}
 
 	//Metods
-	void print()const override
-	{
-		Human::info();
-		cout << speciality << " " << experiance;
-	}
 	void info()const override
 	{
-		//this->print();
 		Human::info();
-		cout << speciality << " " << experiance;
-		cout << endl;
+		cout << speciality << " " << experiance << endl;
+	}
+	std::ostream& info(std::ostream& os)const override
+	{
+		return Human::info(os) << " " << speciality << " " << experiance;
 	}
 };
 
-std::ostream& operator<<(std::ostream& os, const Human& obj)
-{
-	obj.print();
-	return os;
-}
+
 
 //#define INHERITANCE_CHECK
 void main()
@@ -256,15 +255,12 @@ void main()
 	{
 		new Student("Pinkman", "Jessy", 22, "Chemystry", "WW_220", 45, 26),
 		new Teacher("White", "Wolter", 50, "Chemystry", 35),
-		new Graduate("Conor", "McD", 30, "C", "BOW", 98, 100, "How win every time"),
+		new Graduate("Shredor", "Hank", 40, "Criminalistic", "OBN", 80, 90, "How to catch Hesinberg"),
 		new Student("Vercetty", "Tommy", 30, "Theft", "Vice", 97, 98)
 	};
-	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
-	{
-		cout << delimetr;
-		cout << *group[i] << endl;// ->info();
-	}
-	cout << delimetr;
+	
+	Print(group, sizeof(group) / sizeof(group[0]));
+
 	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
 		delete group[i];
 }

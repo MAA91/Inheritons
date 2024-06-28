@@ -1,5 +1,7 @@
 //Academy
 #include<iostream>
+#include<fstream>
+#include<string>
 
 using namespace std;
 
@@ -76,6 +78,21 @@ void Print(Human* group[], const int size)
 		cout << *group[i] << endl;// ->info();
 	}
 	cout << delimetr;
+}
+void Clear(Human* group[], const int size)
+{
+	for (int i = 0; i < size; i++)
+		delete[] group[i];
+}
+
+void Save(Human* group[], const int size, std::string& filename)
+{
+	std::ofstream fout(filename);
+	for (int i = 0; i < size; i++)
+		fout << *group[i] << endl;
+	fout.close();
+	std::string cmd = "notepad " + filename;
+	system(cmd.c_str());
 }
 
 #define STUDENT_TAKE_PARAMETRS const std::string speciality, std::string group, double rating, double attendanse
@@ -258,9 +275,8 @@ void main()
 		new Graduate("Shredor", "Hank", 40, "Criminalistic", "OBN", 80, 90, "How to catch Hesinberg"),
 		new Student("Vercetty", "Tommy", 30, "Theft", "Vice", 97, 98)
 	};
-	
-	Print(group, sizeof(group) / sizeof(group[0]));
 
-	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
-		delete group[i];
+	Print(group, sizeof(group) / sizeof(group[0]));
+	Save(group, sizeof(group) / sizeof(group[0]), "group.txt");
+	Clear(group, sizeof(group) / sizeof(group[0]));
 }

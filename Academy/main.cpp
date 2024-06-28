@@ -85,7 +85,7 @@ void Clear(Human* group[], const int size)
 		delete[] group[i];
 }
 
-void Save(Human* group[], const int size, std::string& filename)
+void Save(Human* group[], const int size, const std::string& filename)
 {
 	std::ofstream fout(filename);
 	for (int i = 0; i < size; i++)

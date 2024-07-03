@@ -291,7 +291,14 @@ public:
 	}
 	std::ifstream& read(std::ifstream& ifs)
 	{
-		Human::read(ifs) >> speciality >> experiance;
+		Human::read(ifs);// >> speciality >> experiance;
+		const int SIZE = SPECIALITY_WIGTH;
+		char buffer[SIZE]{};
+		ifs.read(buffer, SIZE);
+		int poz = strrchr(buffer, ' ') - buffer;
+		buffer[poz] = 0;
+		this->speciality = buffer;
+		ifs >> experiance;
 		return ifs;
 	}
 };

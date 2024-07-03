@@ -1,4 +1,5 @@
-Pinkman Jessy 22 Chemystry WW_220 45 26
-White Wolter 50 Chemystry 35
-Shredor Hank 40 Criminalistic OBN 80 90 How to catch Hesinberg
-Vercetty Tommy 30 Theft Vice 97 98
+Student:  Pinkman        Jessy          22   Chemystry                WW_220  45      26      
+Teacher:  White          Wolter         50   Chemystry                35             
+Graduate: Shredor        Hank           40   Criminalistic            OBN     80      90      How to catch Hesinberg          
+Student:  Vercetty       Tommy          30   Theft                    Vice    97      98      
+Teacher:  Diaz           Ricardo        50   Weapons distribution     20             

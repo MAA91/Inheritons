@@ -295,8 +295,13 @@ public:
 		const int SIZE = SPECIALITY_WIGTH;
 		char buffer[SIZE]{};
 		ifs.read(buffer, SIZE);
-		int poz = strrchr(buffer, ' ') - buffer;
-		buffer[poz] = 0;
+		//int poz = strrchr(buffer, ' ') - buffer;
+		//buffer[poz] = 0;
+		for (int i = SIZE - 1; buffer[i] == ' '; i--)
+			buffer[i] = 0;
+		while (buffer[0] == ' ')
+			for (int i = 0; buffer[i]; i++)
+				buffer[i] = buffer[i + 1];
 		this->speciality = buffer;
 		ifs >> experiance;
 		return ifs;

@@ -177,7 +177,16 @@ public:
 	}
 	std::ifstream& read(std::ifstream& ifs)override
 	{
-		Human::read(ifs) >> speciality >> group >> rating >> attendanse;
+		Human::read(ifs);
+		char buffer[SPECIALITY_WIDTH]{};
+		ifs.read(buffer, SPECIALITY_WIDTH);
+		for (int i = SPECIALITY_WIDTH - 1; buffer[i] == ' '; i--)
+			buffer[i] = 0;
+		while (buffer[0] == ' ')
+			for (int i = 0; buffer[i]; i++)
+				buffer[i] = buffer[i + 1];
+		this->speciality = buffer;
+		ifs >> group >> rating >> attendanse;
 		return ifs;
 	}
 };

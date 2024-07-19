@@ -27,6 +27,15 @@ namespace Geometry
 	{
 	protected:
 		Color color;
+		static const int MIN_START_X = 100;
+		static const int MAX_START_X = 1000;
+		static const int MIN_START_Y = 100;
+		static const int MAX_START_Y = 700;
+		static const int MIN_LINE_WIDTH = 1;
+		static const int MAX_LINE_WIDTH = 31;
+		static const int MIN_SIZE = 50;
+		static const int MAX_SIZE = 550;
+
 		unsigned int start_x;
 		unsigned int start_y;
 		unsigned int line_width;
@@ -63,14 +72,26 @@ namespace Geometry
 		}
 		void set_start_x(unsigned int start_x)
 		{
+			if (start_x < MIN_START_X)
+				start_x = MIN_START_X;
+			if (start_x > MAX_START_X)
+				start_x = MAX_START_X;
 			this->start_x = start_x;
 		}
 		void set_start_y(unsigned int start_y)
 		{
+			if (start_y < MIN_START_Y)
+				start_y = MIN_START_Y;
+			if (start_y > MAX_START_Y)
+				start_y = MAX_START_Y;
 			this->start_y = start_y;
 		}
 		void set_line_width(unsigned int line_width)
 		{
+			if (line_width < MIN_LINE_WIDTH)
+				line_width = MIN_LINE_WIDTH;
+			if (start_x > MAX_LINE_WIDTH)
+				line_width = MAX_LINE_WIDTH;
 			this->line_width = line_width;
 		}
 		virtual void info()const
@@ -78,6 +99,13 @@ namespace Geometry
 			cout << "Площадь фигуры: " << get_area() << endl;
 			cout << "Периметр фигуры:" << get_perimeter() << endl;
 			draw();
+		}
+
+		double filter_size(double size)
+		{
+			if (size < MIN_SIZE)size = MIN_SIZE;
+			if (size > MAX_SIZE)size = MAX_SIZE;
+			return size;
 		}
 	};
 
@@ -178,11 +206,11 @@ namespace Geometry
 		}
 		void set_width(double width)
 		{
-			this->width = width;
+			this->width = filter_size(width);
 		}
 		void set_height(double height)
 		{
-			this->height = height;
+			this->height = filter_size(height);
 		}
 		void info()const override
 		{
@@ -212,7 +240,7 @@ namespace Geometry
 		~Circle() {}
 		void set_radius(double radius)
 		{
-			this->radius = radius;
+			this->radius = filter_size(radius);
 		}
 		double get_radius()const
 		{
@@ -248,15 +276,94 @@ namespace Geometry
 
 			ReleaseDC(hwnd, hdc);
 		} 
+
+		void info()const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << "Радиус: " << radius << endl;
+			this->draw();
+		}
+	};
+
+	class Triangle :public Shape
+	{
+	public:
+		virtual double get_height()const = 0;
+		Triangle(SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS) {}
+		~Triangle() {}
+		void info() const override
+		{
+			cout << "Высота треугольника: " << get_height();
+		}
+	};
+	class EquilateralTriangle :public Triangle
+	{
+		double side;
+	public:
+		double get_side()const
+		{
+			return side;
+		}
+		void set_side(double side)
+		{
+			this->side = filter_size(side);
+		}
+		double get_height()const override
+		{
+			return sqrt(side * side - side / 2 * side / 2);
+		}
+		double get_area()const override
+		{
+			return side / 2 * get_height();
+		}
+		double get_perimeter()const override
+		{
+			return side * 3;
+		}
+		void draw()const override
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+
+			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
+			HBRUSH hBrush = CreateSolidBrush(color);
+
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			POINT apt[] = 
+			{
+				{start_x, start_y + side },
+				{start_x + side, start_y + side },
+				{start_x + side/2, start_y + side - get_height()},
+			};
+			::Polygon(hdc, apt, 3);
+
+			DeleteObject(hBrush);
+			DeleteObject(hPen);
+
+			ReleaseDC(hwnd, hdc);
+		}
+
+		EquilateralTriangle(double side, SHAPE_TAKE_PARAMETERS) :Triangle(SHAPE_GIVE_PARAMETERS)
+		{
+			set_side(side);
+		}
+		~EquilateralTriangle() {}
+		void info() const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << "Длина стороны: " << side << endl;
+			Triangle::info();
+			this->draw();
+		}
 	};
 }
 
 void main()
 {
 	setlocale(0, "");
-	Geometry::Circle circle(5, 500, 500, 300, Geometry::Color::YELLOW);
-	circle.info();
 
-	/*Geometry::Rectangle rect{ 150, 80, 500, 50, 300, Geometry::Color::DARK_RED };
-	rect.info();*/
+	Geometry::EquilateralTriangle e_triangle(150, 500, 500, 5, Geometry::Color::YELLOW);
+	e_triangle.info();
 }

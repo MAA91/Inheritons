@@ -4,7 +4,6 @@
 #include<cmath>
 using namespace std;
 
-
 namespace Geometry
 {
 	enum Color
@@ -109,56 +108,6 @@ namespace Geometry
 		}
 	};
 
-
-	/*class Square :public Shape
-	{
-		double side;
-	public:
-		Square(double side, Color color) :Shape(color)
-		{
-			set_side(side);
-		}
-		virtual ~Square() {}
-
-		double get_area() const override
-		{
-			return side * side;
-		}
-		double get_perimetr()const override
-		{
-			return side * 4;
-		}
-
-		void draw() const override
-		{
-			HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-			SetConsoleTextAttribute(hConsole, get_color());
-			for (int i = 0; i < side; i++)
-			{
-				for (int i = 0; i < side; i++)
-					cout << "* ";
-				cout << endl;
-			}
-			SetConsoleTextAttribute(hConsole, Color::CONSOL_DEFOULT);
-		}
-
-		double get_side()const
-		{
-			return side;
-		}
-		void set_side(double side)
-		{
-			this->side = side;
-		}
-
-		void info()const override
-		{
-			cout << typeid(*this).name() << endl;
-			cout << "Длина стороны: " << this->get_side() << endl;
-			Shape::info();
-		}
-	};*/
-
 	class Rectangle :public Shape
 	{
 		double width;
@@ -220,7 +169,6 @@ namespace Geometry
 			Shape::info();
 		}
 	};
-
 	class Square :public Rectangle
 	{
 	public:
@@ -310,7 +258,7 @@ namespace Geometry
 		}
 		double get_height()const override
 		{
-			return sqrt(side * side - side / 2 * side / 2);
+			return sqrt(side * side - side * side / 4);
 		}
 		double get_area()const override
 		{
@@ -358,12 +306,163 @@ namespace Geometry
 			this->draw();
 		}
 	};
+	class IsoscelesTriangle : public Triangle
+	{
+		double side;
+		double base;
+	public: 
+		double get_side()const
+		{
+			return side;
+		}
+		double get_base()const
+		{
+			return base;
+		}
+		void set_side(double side)
+		{
+			this->side = filter_size(side);
+		}
+		void set_base(double base)
+		{
+			this->base = filter_size(base);
+		}
+		double get_height()const override
+		{
+			return sqrt(side * side - base * base / 4);
+		}
+		double get_area()const override
+		{
+			return side * get_height() / 2;
+		}
+		double get_perimeter()const override
+		{
+			return 2 * side + base;
+		}
+		void draw() const override
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+
+			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
+			HBRUSH hBrush = CreateSolidBrush(color);
+
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			POINT apt[] =
+			{
+				{start_x, start_y + side },
+				{start_x + base, start_y + side },
+				{start_x + base / 2, start_y + side - get_height()},
+			};
+			::Polygon(hdc, apt, 3);
+
+			DeleteObject(hBrush);
+			DeleteObject(hPen);
+
+			ReleaseDC(hwnd, hdc);
+		}
+
+		IsoscelesTriangle(double side, double base, SHAPE_TAKE_PARAMETERS) : Triangle(SHAPE_GIVE_PARAMETERS)
+		{
+			set_base(base);
+			set_side(side);
+		}
+		~IsoscelesTriangle() {}
+		void info()const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << "Длина стороны: " << side << endl;
+			cout << "Длина основания: " << base << endl;
+			Triangle::info();
+			this->draw();
+		}
+	};
+	class RectangularTriangle : public Triangle
+	{
+		double catheter1;
+		double catheter2;
+	public:
+		double get_catheter1()const
+		{
+			return catheter1;
+		}
+		double get_catheter2()const
+		{
+			return catheter2;
+		}
+		void set_catheter1(double catheter1)
+		{
+			this->catheter1 = filter_size(catheter1);
+		}
+		void set_catheter2(double catheter2)
+		{
+			this->catheter2 = filter_size(catheter2);
+		}
+		double get_area()const override
+		{
+			return catheter1 * catheter2 / 2;
+		}
+		double get_hypotenuse()const
+		{
+			return sqrt(catheter1 * catheter1 + catheter2 * catheter2);
+		}
+		double get_height()const override
+		{
+			return get_area() / get_hypotenuse();
+		}
+		double get_perimeter()const override
+		{
+			return catheter1 + catheter2 + get_hypotenuse();
+		}
+		void draw()const override
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+
+			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
+			HBRUSH hBrush = CreateSolidBrush(color);
+
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			POINT apt[] =
+			{
+				{start_x, start_y },
+				{start_x, start_y + catheter1 },
+				{start_x + catheter2, start_y + catheter1},
+			};
+			::Polygon(hdc, apt, 3);
+
+			DeleteObject(hBrush);
+			DeleteObject(hPen);
+
+			ReleaseDC(hwnd, hdc);
+		}
+		
+		RectangularTriangle(double catheter1, double catheter2, SHAPE_TAKE_PARAMETERS): Triangle(SHAPE_GIVE_PARAMETERS)
+		{
+			set_catheter1(catheter1);
+			set_catheter2(catheter2);
+		}
+		~RectangularTriangle() {}
+		void info()const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << "Катет 1: " << catheter1 << endl;
+			cout << "Катет 2: " << catheter2 << endl;
+			cout << "Гипотенуза: " << get_hypotenuse() << endl;
+			Triangle::info();
+			this->draw();
+		}
+	};
 }
 
 void main()
 {
 	setlocale(0, "");
 
-	Geometry::EquilateralTriangle e_triangle(150, 500, 500, 5, Geometry::Color::YELLOW);
-	e_triangle.info();
+	Geometry::RectangularTriangle r_triangle(150, 200, 500, 200, 5, Geometry::Color::YELLOW);
+	r_triangle.info();
 }
